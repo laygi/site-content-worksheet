@@ -548,13 +548,20 @@ function apply(s){
   count();
 }
 function stamp(t, warn){ const e=document.getElementById("saved"); e.textContent=t; e.style.color = warn?"var(--red)":"var(--ink3)"; }
+const CAN_STORE = (function(){
+  try{ localStorage.setItem("__probe","1"); localStorage.removeItem("__probe"); return true; }
+  catch(e){ return false; }
+})();
+const NO_STORE_MSG = "⚠ 這個瀏覽器不會自動記住內容 — 請常按「存檔」";
 function save(){
+  if(!CAN_STORE){ stamp(NO_STORE_MSG, true); return; }
   try{
     localStorage.setItem(KEY, JSON.stringify(state()));
     stamp("已記住 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}));
-  }catch(err){ stamp("⚠ 圖片太多記不住，請先按「存檔」下載", true); }
+  }catch(err){ stamp("⚠ 圖片太多存不下 — 請按「存檔」把進度下載下來", true); }
 }
-try{ const raw = localStorage.getItem(KEY); if(raw) apply(JSON.parse(raw)); }catch(e){}
+if(CAN_STORE){ try{ const raw = localStorage.getItem(KEY); if(raw) apply(JSON.parse(raw)); }catch(e){} }
+else { stamp(NO_STORE_MSG, true); }
 if(!when.value) when.value = new Date().toLocaleDateString("zh-TW");
 count();
 
@@ -702,7 +709,11 @@ document.getElementById("b-png").onclick = ()=>{
   if(window.html2canvas) return run();
   toast("圖片工具還在載入，等一下再按一次");
 };
-window.addEventListener("beforeunload", save);
+window.addEventListener("beforeunload", function(e){
+  save();
+  // 瀏覽器不會自動記住、而且已經填了東西 → 關掉前攔一下，免得白填
+  if(!CAN_STORE && document.querySelector(".f.filled")){ e.preventDefault(); e.returnValue = ""; }
+});
 </script>
 
 </body>
