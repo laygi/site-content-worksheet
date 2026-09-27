@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+<title>網站內容填寫表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --paper:#fffffe; --bg:#e9e8e2; --fill:#f4f3ec; --wash:#faf9f3;
+  --ink:#1a1a16; --ink2:#67675d; --ink3:#a2a296;
+  --line:#c6c5ba; --line2:#e2e1d8; --line3:#eeede6;
+  --red:#a83a2b; --red-bg:#fbf1ef; --green:#3b6e52;
+  --hatch-a:#eceade; --hatch-b:#f7f6ef;
+  --f-xs:11px; --f-sm:12px; --f-md:13px; --f-lg:15px; --f-xl:19px;
+  --s1:6px; --s2:10px; --s3:16px; --s4:24px;
+  --bar:56px;
+  color-scheme:light;
+  --sans:"Noto Sans TC","PingFang TC","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html{height:100%;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:var(--f-md);line-height:1.75;-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--paper);
+  border-bottom:1px solid var(--line);display:flex;align-items:stretch;flex-wrap:wrap;}
+.topbar > *{display:flex;align-items:center;padding:0 var(--s4);}
+.tb-title{flex-direction:column;align-items:flex-start;justify-content:center;line-height:1.3;
+  font-size:var(--f-lg);font-weight:700;height:var(--bar);border-right:1px solid var(--line2);}
+.tb-title small{font-size:10px;font-weight:400;color:var(--ink3);letter-spacing:.18em;}
+.tb-meta{gap:var(--s2);border-right:1px solid var(--line2);font-size:var(--f-sm);color:var(--ink2);
+  height:var(--bar);}
+.tb-meta input{border:none;border-bottom:1px dashed var(--line);background:transparent;
+  font:inherit;font-size:var(--f-sm);color:var(--ink);padding:2px 4px;width:104px;outline:none;}
+.tb-meta input:focus{border-bottom-color:var(--ink);background:var(--fill);}
+.tb-prog{flex:1;gap:var(--s2);font-size:var(--f-sm);color:var(--ink2);height:var(--bar);min-width:200px;
+  font-variant-numeric:tabular-nums;}
+.meter{flex:1;max-width:220px;height:6px;background:var(--line3);border:1px solid var(--line2);}
+.meter i{display:block;height:100%;background:var(--green);width:0;transition:width .25s;}
+.tb-acts{gap:0;padding:0;}
+.btn{appearance:none;border:none;border-left:1px solid var(--line2);background:var(--paper);
+  font-size:var(--f-sm);color:var(--ink);padding:0 var(--s3);height:var(--bar);cursor:pointer;white-space:nowrap;}
+.btn:hover{background:var(--fill);}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:-3px;}
+.btn.primary{background:var(--ink);color:var(--paper);}
+.btn[disabled]{opacity:.35;cursor:not-allowed;}
+
+.shell{display:grid;grid-template-columns:206px 1fr;align-items:start;}
+.shell > *{min-width:0;}
+.side{position:sticky;top:calc(var(--bar) + env(safe-area-inset-top,0px));background:var(--paper);
+  border-right:1px solid var(--line);height:calc(100vh - var(--bar));overflow:auto;}
+.side h3{margin:0;padding:var(--s3) var(--s4) var(--s2);font-size:10px;letter-spacing:.18em;
+  color:var(--ink3);font-weight:500;}
+.side a{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);
+  padding:var(--s2) var(--s4);border-top:1px solid var(--line3);color:var(--ink);
+  cursor:pointer;font-size:var(--f-sm);}
+.side a:hover{background:var(--fill);}
+.side a.on{background:var(--ink);color:var(--paper);}
+.side a .n{font-size:var(--f-xs);color:var(--ink3);font-variant-numeric:tabular-nums;}
+.side a.on .n{color:var(--ink3);}
+.side a.done .n{color:var(--green);}
+.side .tip{padding:var(--s3) var(--s4);border-top:1px solid var(--line3);
+  font-size:var(--f-xs);line-height:1.9;color:var(--ink2);}
+.side .tip b{color:var(--ink);}
+.side .tip i{display:block;padding-left:11px;text-indent:-11px;font-style:normal;}
+
+.main{padding:var(--s4) var(--s3);min-width:0;}
+.frame{max-width:980px;margin:0 auto;background:var(--paper);border:1px solid var(--line);}
+.browserbar{background:var(--line3);border-bottom:1px solid var(--line);padding:9px 14px;display:flex;gap:6px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--line);}
+
+.nav{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+  padding:var(--s3) var(--s4);border-bottom:1px dashed var(--line);flex-wrap:wrap;}
+.logo{border:1px dashed var(--line);padding:6px 16px;font-size:var(--f-xs);color:var(--ink3);letter-spacing:.14em;}
+.navlinks{display:flex;gap:2px;font-size:var(--f-xs);color:var(--ink2);flex-wrap:wrap;}
+.navlinks span{padding:5px 9px;cursor:pointer;}
+.navlinks span:hover{background:var(--fill);}
+.navlinks span.on{background:var(--ink);color:var(--paper);}
+
+.section{padding:var(--s4) var(--s3);border-bottom:1px dashed var(--line2);}
+.section:last-child{border-bottom:none;}
+.label{font-size:10px;letter-spacing:.16em;color:var(--ink3);margin:0 0 var(--s3);font-weight:500;}
+.sub{font-size:var(--f-sm);font-weight:700;margin:0 0 var(--s1);}
+
+.grid{display:grid;gap:1px;background:var(--line2);border:1px solid var(--line2);}
+.grid.c2{grid-template-columns:1fr 1fr;}
+.grid.c3{grid-template-columns:repeat(3,1fr);}
+.cell{background:var(--paper);padding:var(--s3);min-width:0;}
+.stack > * + *{margin-top:var(--s2);}
+
+.f{border:1px solid var(--line2);border-left:3px solid var(--line);background:var(--fill);
+  padding:8px 10px;min-height:38px;outline:none;font-size:var(--f-md);line-height:1.8;
+  white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;}
+.f:hover{border-color:var(--line);}
+.f:focus{background:var(--wash);border-color:var(--ink);border-left-color:var(--ink);}
+.f.big{min-height:104px;}
+.f.sm{min-height:32px;font-size:var(--f-sm);}
+.f.ttl{font-size:var(--f-xl);font-weight:700;line-height:1.55;min-height:48px;text-wrap:balance;}
+.f.filled{border-left-color:var(--green);background:var(--wash);}
+.f:empty:before{content:attr(data-ph);color:var(--ink3);}
+.cap{font-size:var(--f-xs);color:var(--ink3);margin:0 0 4px;}
+
+.img-ph{position:relative;border:1px solid var(--line);cursor:pointer;overflow:hidden;max-width:100%;
+  background:repeating-linear-gradient(45deg,var(--hatch-a),var(--hatch-a) 8px,var(--hatch-b) 8px,var(--hatch-b) 16px);
+  display:flex;align-items:center;justify-content:center;text-align:center;}
+.img-ph:hover{border-color:var(--ink);}
+.img-ph .img-hint{font-size:var(--f-xs);color:var(--ink2);padding:var(--s2);}
+.img-ph .img-hint em{color:var(--ink3);font-style:normal;font-size:10px;}
+.img-ph.has{background:var(--paper);}
+.img-ph.has img{width:100%;height:100%;object-fit:cover;display:block;}
+.img-ph.has .img-hint{display:none;}
+.img-ph .x{position:absolute;top:4px;right:4px;background:var(--ink);color:var(--paper);
+  font-size:10px;padding:2px 6px;display:none;}
+.img-ph.has:hover .x{display:block;}
+
+.ask{border:1px solid var(--red);background:var(--red-bg);padding:var(--s3);margin-top:var(--s3);}
+.ask-q{margin:0 0 var(--s2);font-size:var(--f-sm);color:var(--red);font-weight:700;}
+.chips{display:flex;gap:1px;background:var(--line2);border:1px solid var(--line2);
+  width:fit-content;max-width:100%;margin-bottom:var(--s2);flex-wrap:wrap;}
+.chip{background:var(--paper);padding:6px 14px;font-size:var(--f-sm);cursor:pointer;}
+.chip:hover{background:var(--fill);}
+.chip.on{background:var(--ink);color:var(--paper);}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:var(--f-sm);
+  padding:10px 20px;max-width:88vw;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99;}
+.toast.on{opacity:1;}
+.cell.fillcell{display:flex;flex-direction:column;}
+.cell.fillcell .img-ph{flex:1;}
+.setupbar{justify-content:flex-start;gap:14px;}
+.setupnote{font-size:var(--f-xs);color:var(--ink3);}
+.side a.setupitem{font-weight:700;border-top:none;}
+.page{display:none;} .page.on{display:block;}
+
+
+@media print{
+  body{background:#fff;}
+  .topbar,.side,.toast{display:none !important;}
+  .shell{display:block;}
+  .main{padding:0;}
+  .frame{border:none;max-width:none;}
+  .browserbar{display:none;}
+  .page{display:block !important;page-break-after:always;}
+  .f{background:#fff;border-left-color:var(--line);}
+  .img-ph,.grid,.ask{page-break-inside:avoid;}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+@media (max-width:880px){
+  .shell{grid-template-columns:1fr;}
+  .side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .side #sidenav{display:flex;flex-wrap:wrap;}
+  .side #sidenav a{border-top:none;border-right:1px solid var(--line3);
+    padding:var(--s2) var(--s3);flex:1 1 auto;min-width:0;}
+  .grid.c3,.grid.c2{grid-template-columns:1fr;}
+  .tb-title,.tb-meta{border-right:none;}
+  .tb-acts{width:100%;border-top:1px solid var(--line2);flex-wrap:wrap;}
+  .tb-acts .btn{flex:1 1 0;min-width:0;padding:0 var(--s2);height:46px;}
+  .main{padding:var(--s3) var(--s2);}
+  .section{padding:var(--s3) var(--s2);}
+  .nav{padding:var(--s3) var(--s2);}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tb-title">網站內容填寫表<small>SITE CONTENT WORKSHEET</small></div>
+  <div class="tb-meta">
+    <label for="who">填寫人</label><input id="who" placeholder="你的名字">
+    <label for="when">日期</label><input id="when" style="width:92px">
+  </div>
+  <div class="tb-prog"><span id="progtxt">0 / 0</span><span class="meter"><i id="meter"></i></span><span id="saved" style="color:var(--ink3)"></span></div>
+  <div class="tb-acts">
+    <button class="btn" id="b-load">讀取存檔</button>
+    <button class="btn" id="b-save">存檔</button>
+    <button class="btn" id="b-print">列印／PDF</button>
+    <button class="btn" id="b-png">這頁存成圖</button>
+    <button class="btn primary" id="b-doc">交件</button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="side">
+    <h3>全　站</h3>
+    <div id="setupnav"></div>
+    <h3>頁　面</h3>
+    <div id="sidenav"></div>
+    <div class="tip">
+      <i>· 有底色的框直接打字就好，會自動記住</i>
+      <i>· 灰底斜線的方塊點一下可以放圖</i>
+      <i>· 紅框是要請你決定的事</i>
+      <i>· 填完按右上角 <b>交件</b>，把下載的 Word 檔傳給設計師</i>
+      <i>· 內容只記在這台電腦的瀏覽器裡。要換電腦填，先按<b>存檔</b>把檔案帶走</i>
+    </div>
+  </aside>
+  <main class="main"><div class="frame" id="frame">
+    <div class="browserbar"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div id="pages"></div>
+  </div></main>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="filepick" accept="image/*" hidden>
+<input type="file" id="jsonpick" accept=".json,application/json" hidden>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+/* ============ 導覽列（已改成新命名） ============ */
+const NAV = [
+  {k:"home",    en:"首頁",       zh:"首頁"},
+  {k:"about",   en:"About us",   zh:"關於我們"},
+  {k:"stay",    en:"Stay",       zh:"住宿"},
+  {k:"access",  en:"Access",     zh:"交通"},
+  {k:"wander",  en:"Wander",     zh:"周邊漫遊"},
+  {k:"qa",      en:"Q&A",        zh:"常見問題"},
+  {k:"contact", en:"Contact",    zh:"聯絡我們"},
+  {k:"journal", en:"Journal",    zh:"山裡的事情"}
+];
+
+/* ============ 小元件 ============ */
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const T   = (k,ph,cls="") => `<div class="f ${cls}" contenteditable="true" spellcheck="false" data-k="${k}" data-ph="${esc(ph)}"></div>`;
+const CAP = t => `<p class="cap">${t}</p>`;
+const IMG = (k,h,ph) => `<div class="img-ph" data-img="${k}" data-ph="${esc(ph)}" style="height:${h}px"><span class="img-hint">${ph}<br><em>點一下上傳圖片（可留空，之後再給檔案）</em></span><span class="x" data-del="${k}">移除</span></div>`;
+const ASK = (k,q,opts) => `<div class="ask"><p class="ask-q">請你決定：${q}</p>
+  <div class="chips">${opts.map(o=>`<span class="chip" data-chip="${k}" data-v="${esc(o)}">${o}</span>`).join("")}</div>
+  ${T(k+"__note","補充說明（可留空）","sm note-f")}</div>`;
+const SEC = (label,inner) => `<div class="section" data-sec="${esc(label)}"><p class="label">${label}</p>${inner}</div>`;
+
+function navBar(cur){
+  return `<div class="nav">
+    <div class="logo">LOGO</div>
+    <div class="navlinks">${NAV.filter(n=>n.k!=="home").map(n=>`<span class="${n.k===cur?'on':''}" data-go="${n.k}">${n.en}</span>`).join("")}</div>
+  </div>`;
+}
+
+/* ============ 各頁內容 ============ */
+const PAGES = {
+
+home: navBar("home")
++ SEC("Hero — 主視覺＋一句歡迎",
+    IMG("home_hero",240,"主視覺照片或插圖（橫式，越大越好）")
+  + `<div class="stack" style="margin-top:16px">
+      ${CAP("大標（建議 10–16 字，是一句主張，不是題目）")}${T("home_h1","例：在山裡，光會自己找到路","ttl")}
+      ${CAP("副標／歡迎詞（建議 40–70 字）")}${T("home_h1sub","簡單說這裡是什麼、給誰來、來了會怎樣","big")}
+    </div>`)
++ SEC("Intro — 三個房間與合作方式",
+    `<div class="grid c2">
+      <div class="cell">${IMG("home_intro_img",190,"包棟／屋子代表照")}</div>
+      <div class="cell stack">
+        ${CAP("小標（建議 8–14 字）")}${T("home_intro_h","")}
+        ${CAP("內文（建議 80–120 字）")}${T("home_intro_b","介紹三個房間與你們的合作方式","big")}
+        ${CAP("按鈕文字")}${T("home_intro_btn","例：認識我們 →","sm")}
+      </div>
+    </div>`)
++ SEC("Location — 位置圖片＋敘事文案",
+    `<div class="grid c2">
+      <div class="cell">${IMG("home_loc_img",190,"地圖或環境照")}</div>
+      <div class="cell stack">
+        ${CAP("小標")}${T("home_loc_h","")}
+        ${CAP("內文（建議 60–100 字，寫氛圍不寫路線）")}${T("home_loc_b","","big")}
+      </div>
+    </div>`)
++ SEC("Footer — 聯絡方式",
+    `<div class="grid c3">
+      <div class="cell">${CAP("Instagram 帳號")}${T("home_ig","@","sm")}</div>
+      <div class="cell">${CAP("訂房連結")}${T("home_book","https://","sm")}</div>
+      <div class="cell">${CAP("Line ID")}${T("home_line","","sm")}</div>
+    </div>`
+  + ASK("ask_book_link","網站要不要直接串訂房網址？",["要，直接跳轉","不要，只留聯絡方式","還沒決定"])),
+
+about: navBar("about")
++ SEC("1. 品牌詳述",
+    CAP("品牌故事（建議 200–400 字，可以分段）")+T("about_story","","big")
+  + CAP("主理人一句話自介（建議 20–35 字）")+T("about_oneline",""))
++ SEC("2. 插圖", IMG("about_img",220,"插圖或人物照"))
++ SEC("3. 訂房連結",
+    CAP("按鈕文字")+T("about_btn","例：前往訂房","sm")
+  + ASK("ask_about_book","這頁需要訂房按鈕嗎？",["需要","不需要"])),
+
+stay: navBar("stay")
++ SEC("區塊開頭",
+    CAP("小標")+T("stay_h","")+CAP("引言（建議 40–80 字）")+T("stay_intro","","big"))
++ SEC("三個房型",
+    `<div class="grid c3">`
+    + [["soil","About soil","曆光"],["stone","About stone","循光"],["plant","About Plant","勻光"]].map(([id,en,zh])=>
+      `<div class="cell stack">
+        ${IMG("stay_"+id+"_img",140,"空間照")}
+        ${CAP("房型名稱")}${T("stay_"+id+"_name",zh,"sm")}
+        ${CAP("英文名")}${T("stay_"+id+"_en",en,"sm")}
+        ${CAP("一句話特色（建議 15–25 字）")}${T("stay_"+id+"_tag","","sm")}
+        ${CAP("介紹（建議 80–150 字）")}${T("stay_"+id+"_body","","big")}
+        ${CAP("可住人數／房型規格")}${T("stay_"+id+"_spec","例：2 人・一大床・含早餐","sm")}
+      </div>`).join("")
+    + `</div>`
+  + ASK("ask_stay_book","每個房型頁要不要各自串訂房連結？",["要，各自一條","不要，統一一條","還沒決定"])),
+
+access: navBar("access")
++ SEC("交通方式",
+    `<div class="grid c2">
+      <div class="cell stack">
+        <p class="sub">a. 自行開車</p>
+        ${CAP("路線說明（建議 60–120 字）")}${T("acc_car","","big")}
+        ${CAP("停車場 A")}${T("acc_park_a","名稱／位置／步行幾分鐘","sm")}
+        ${CAP("停車場 B")}${T("acc_park_b","","sm")}
+      </div>
+      <div class="cell stack">
+        <p class="sub">b. 大眾運輸</p>
+        ${CAP("路線說明（建議 60–120 字）")}${T("acc_pub","","big")}
+        ${CAP("最近火車站")}${T("acc_train","","sm")}
+        ${CAP("公車站／班次")}${T("acc_bus","","sm")}
+        ${CAP("計程車／包車")}${T("acc_taxi","車行名稱、電話、大約車資","sm")}
+      </div>
+    </div>`)
++ SEC("抵達房間的最後一段",
+    CAP("從停車處到房間怎麼走（建議 40–80 字）")+T("acc_last","","big"))
++ SEC("地圖",
+    `<div class="grid c2">
+      <div class="cell">${IMG("acc_map",200,"地圖截圖或手繪地圖")}</div>
+      <div class="cell stack">
+        ${CAP("完整地址")}${T("acc_addr","","sm")}
+        ${CAP("Google Map 連結")}${T("acc_gmap","https://","sm")}
+      </div>
+    </div>`),
+
+wander: navBar("wander")
++ SEC("怎麼玩、怎麼走",
+    CAP("引言（建議 40–80 字）")+T("wan_intro","","big")
+  + `<div class="grid c3" style="margin-top:16px">`
+    + [["see","a. 看","風景、景點、拍照的地方"],["eat","b. 吃","餐廳、市集、在地食物"],["hear","c. 聽","導覽、聲音、故事"]].map(([id,t,ph])=>
+      `<div class="cell stack">
+        <p class="sub">${t}</p>
+        ${IMG("wan_"+id+"_img",110,"代表照")}
+        ${CAP("標題")}${T("wan_"+id+"_h","","sm")}
+        ${CAP("內容（建議 60–100 字）— "+ph+"")}${T("wan_"+id+"_b","","big")}
+      </div>`).join("")
+    + `</div>`)
++ SEC("導覽預約",
+    CAP("導覽名稱")+T("wan_tour_name","例：into the wild","sm")
+  + CAP("說明（時間、人數、費用、怎麼預約）")+T("wan_tour_b","","big")),
+
+qa: navBar("qa")
++ SEC("常見問題",
+    [1,2,3,4,5,6].map(i=>
+      `<div class="grid c2" style="margin-bottom:${i<6?'12px':'0'}">
+        <div class="cell">${CAP("Q"+i+"　問題")}${T("qa_q"+i,"","sm")}</div>
+        <div class="cell">${CAP("A"+i+"　回答")}${T("qa_a"+i,"","sm")}</div>
+      </div>`).join("")
+  + ASK("ask_qa_reuse","常見問題要沿用之前「循光」的版本嗎？",["沿用，我再補充","重寫","還沒決定"]))
++ SEC("這頁底部",
+    ASK("ask_qa_book","這頁底部要不要放聯絡方式／訂房連結？",["要","不要"])),
+
+contact: navBar("contact")
++ SEC("聯絡我們",
+    `<div class="grid c3">
+      ${[["ig","Instagram","@帳號"],["book","訂房","訂房平台名稱或網址"],["line","Line","Line ID 或 @官方帳號"]]
+        .map(([id,t,ph])=>`<div class="cell stack">
+          <p class="sub">${t}</p>
+          ${CAP("顯示文字")}${T("ct_"+id+"_t",ph,"sm")}
+          ${CAP("連結")}${T("ct_"+id+"_u","https://","sm")}
+        </div>`).join("")}
+    </div>`)
++ SEC("其他",
+    `<div class="grid c2">
+      <div class="cell">${CAP("電話")}${T("ct_tel","","sm")}</div>
+      <div class="cell">${CAP("Email")}${T("ct_mail","","sm")}</div>
+    </div>`
+  + CAP("想對訪客說的一句話（可留空）")+T("ct_word","","sm")),
+
+journal: navBar("journal")
++ SEC("山裡的事情 Journal",
+    CAP("專欄標題")+T("jn_h","")
+  + CAP("專欄簡介（建議 60–100 字）")+T("jn_intro","","big")
+  + CAP("書寫者簡短介紹")+T("jn_author","","sm"))
++ SEC("分類名稱",
+    `<div class="grid c3">
+      ${["jn_c1","jn_c2","jn_c3","jn_c4","jn_c5","jn_c6"].map((k,i)=>
+        `<div class="cell">${CAP("分類 "+(i+1))}${T(k,["訪談","山藏","搬石頭","土地","植物","礦物"][i],"sm")}</div>`).join("")}
+    </div>`)
++ SEC("文章列表（先給 3–6 篇就好）",
+    `<div class="grid c3">
+      ${[1,2,3,4,5,6].map(i=>`<div class="cell stack">
+        ${IMG("jn_"+i+"_img",100,"文章封面")}
+        ${CAP("標題")}${T("jn_"+i+"_t","","sm")}
+        ${CAP("摘要（建議 30–50 字）")}${T("jn_"+i+"_d","","sm")}
+      </div>`).join("")}
+    </div>`
+  + ASK("ask_jn_host","長文要放在哪裡？",["自己網站上的部落格","放 Medium，網站只放連結","還沒決定"]))
+};
+
+
+
+/* ============ 全站共用設定（不是網站的其中一頁） ============ */
+PAGES.setup = `
+  <div class="nav setupbar">
+    <div class="logo">全站共用</div>
+    <span class="setupnote">這一頁不是網站的某一頁，是整個網站到處都會用到的東西</span>
+  </div>`
++ SEC("品牌基本資料",
+    `<div class="grid c2">
+      <div class="cell">${CAP("品牌中文名")}${T("g_name_zh","","sm")}</div>
+      <div class="cell">${CAP("品牌英文名")}${T("g_name_en","","sm")}</div>
+      <div class="cell">${CAP("一句話標語（中文）")}${T("g_tag_zh","放在 LOGO 旁邊或頁尾的那一句","sm")}</div>
+      <div class="cell">${CAP("一句話標語（英文，可留空）")}${T("g_tag_en","","sm")}</div>
+    </div>`
+  + `<div class="grid c2" style="margin-top:16px">
+      <div class="cell fillcell">${CAP("LOGO 檔案")}${IMG("g_logo",130,"LOGO（有向量檔 AI／SVG 最好，之後再給也可以）")}</div>
+      <div class="cell stack">
+        ${CAP("網址／網域（已經有的話）")}${T("g_domain","例：www.example.com","sm")}
+        ${CAP("網站標題（瀏覽器分頁上顯示的那行字）")}${T("g_sitetitle","","sm")}
+        ${CAP("希望網站給人的感覺（三個形容詞就好）")}${T("g_mood","例：安靜、乾淨、有溫度","sm")}
+      </div>
+    </div>`)
++ SEC("導覽列命名（中英對照）",
+    `<p class="cap" style="margin-bottom:12px">英文已經定案了，請填中文要怎麼寫。這會出現在網站最上面那排。</p>
+     <div class="grid c2">${NAV.map(n=>`<div class="cell"><p class="cap">${n.en}</p>${T("nav_"+n.k,"中文怎麼寫？例：「"+n.zh+"」","sm")}</div>`).join("")}</div>`)
++ SEC("全站共用文字",
+    `<div class="grid c2">
+      <div class="cell">${CAP("訂房按鈕統一寫什麼")}${T("g_btn_book","例：立即訂房","sm")}</div>
+      <div class="cell">${CAP("頁尾版權文字")}${T("g_copyright","例：© 2026 ○○○ All rights reserved.","sm")}</div>
+    </div>`
+  + ASK("ask_bilingual","網站要做中英雙語嗎？",["中英雙語","只做中文","只做英文","還沒決定"]));
+
+const ALL = [{k:"setup", en:"網站通用設定"}].concat(NAV);
+
+/* ============ 渲染 ============ */
+const pagesEl = document.getElementById("pages");
+ALL.forEach((n,i)=>{
+  const d = document.createElement("div");
+  d.className = "page" + (i===0?" on":"");
+  d.id = "pg-" + n.k;
+  d.innerHTML = PAGES[n.k];
+  pagesEl.appendChild(d);
+});
+document.getElementById("sidenav").innerHTML =
+  NAV.map(n=>`<a tabindex="0" data-go="${n.k}"><span>${n.en}</span><span class="n" id="cnt-${n.k}">0/0</span></a>`).join("");
+
+document.getElementById("setupnav").innerHTML =
+  `<a tabindex="0" data-go="setup" class="setupitem on"><span>網站通用設定</span><span class="n" id="cnt-setup">0/0</span></a>`;
+
+let CUR = ALL[0].k;
+function goPage(k){
+  if(!ALL.some(n=>n.k===k)) return;
+  CUR = k;
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("on", p.id==="pg-"+k));
+  document.querySelectorAll(".side a").forEach(a=>a.classList.toggle("on", a.dataset.go===k));
+  window.scrollTo({top:0,behavior:"instant"});
+}
+document.addEventListener("click", e=>{
+  const go = e.target.closest("[data-go]");
+  if(go){ goPage(go.dataset.go); return; }
+  const chip = e.target.closest(".chip");
+  if(chip){
+    const g = chip.dataset.chip, on = chip.classList.contains("on");
+    document.querySelectorAll(`.chip[data-chip="${g}"]`).forEach(c=>c.classList.remove("on"));
+    if(!on) chip.classList.add("on");
+    save(); count(); return;
+  }
+  const del = e.target.closest("[data-del]");
+  if(del){ e.stopPropagation(); setImg(del.dataset.del, null); save(); return; }
+  const img = e.target.closest("[data-img]");
+  if(img){ pickImg(img.dataset.img); return; }
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.target.matches?.(".side a")){ goPage(e.target.dataset.go); }
+});
+
+/* ============ 圖片 ============ */
+const IMGS = {};
+const filepick = document.getElementById("filepick");
+let imgTarget = null;
+function pickImg(k){ imgTarget = k; filepick.value=""; filepick.click(); }
+filepick.addEventListener("change", ()=>{
+  const f = filepick.files[0]; if(!f || !imgTarget) return;
+  const r = new FileReader();
+  r.onload = () => { setImg(imgTarget, {name:f.name, data:r.result}); save(); };
+  r.readAsDataURL(f);
+});
+function setImg(k, v){
+  const box = document.querySelector(`[data-img="${k}"]`);
+  if(v) IMGS[k]=v; else delete IMGS[k];
+  if(!box) return;
+  box.querySelectorAll("img").forEach(n=>n.remove());
+  if(v){ const im=new Image(); im.src=v.data; im.alt=v.name; box.prepend(im); box.classList.add("has"); }
+  else box.classList.remove("has");
+  count();
+}
+
+/* ============ 輸入 ============ */
+document.addEventListener("paste", e=>{
+  const f = e.target.closest?.(".f"); if(!f) return;
+  e.preventDefault();
+  const t = (e.clipboardData||window.clipboardData).getData("text/plain");
+  document.execCommand("insertText", false, t);
+});
+let tmr;
+document.addEventListener("input", e=>{
+  const f = e.target.closest?.(".f");
+  if(f && !f.textContent.trim()) f.innerHTML = "";
+  if(f || e.target.id==="who" || e.target.id==="when"){
+    clearTimeout(tmr); tmr = setTimeout(save, 400); count();
+  }
+});
+
+/* ============ 進度 ============ */
+function count(){
+  let tot=0, fil=0;
+  ALL.forEach(n=>{
+    const pg = document.getElementById("pg-"+n.k);
+    const fs = [...pg.querySelectorAll(".f[data-k]")].filter(f=>!f.dataset.k.endsWith("__note"));
+    const asks = [...new Set([...pg.querySelectorAll(".chip")].map(c=>c.dataset.chip))];
+    const t = fs.length + asks.length;
+    const f = fs.filter(x=>x.textContent.trim()).length
+            + asks.filter(g=>document.querySelector(`.chip[data-chip="${g}"].on`)).length;
+    fs.forEach(x=>x.classList.toggle("filled", !!x.textContent.trim()));
+    tot += t; fil += f;
+    const el = document.getElementById("cnt-"+n.k);
+    if(el){ el.textContent = f+"/"+t; el.parentElement.classList.toggle("done", f===t && t>0); }
+  });
+  document.getElementById("progtxt").textContent = fil+" / "+tot;
+  document.getElementById("meter").style.width = (tot?Math.round(fil/tot*100):0)+"%";
+}
+
+/* ============ 存 / 讀 ============ */
+const KEY = "site_worksheet_v1";
+const who = document.getElementById("who"), when = document.getElementById("when");
+function state(){
+  const fields = {};
+  document.querySelectorAll(".f[data-k]").forEach(f=>{ if(f.textContent.trim()) fields[f.dataset.k]=f.innerText; });
+  const chips = {};
+  document.querySelectorAll(".chip.on").forEach(c=>{ chips[c.dataset.chip]=c.dataset.v; });
+  return {v:1, who:who.value, when:when.value, fields, chips, imgs:IMGS};
+}
+function apply(s){
+  if(!s) return;
+  who.value = s.who||""; when.value = s.when||"";
+  document.querySelectorAll(".f[data-k]").forEach(f=>{
+    const v = (s.fields&&s.fields[f.dataset.k])||""; if(v) f.innerText=v; else f.innerHTML="";
+  });
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on", !!(s.chips && s.chips[c.dataset.chip]===c.dataset.v)));
+  Object.keys(IMGS).forEach(k=>setImg(k,null));
+  if(s.imgs) Object.entries(s.imgs).forEach(([k,v])=>setImg(k,v));
+  count();
+}
+function stamp(t, warn){ const e=document.getElementById("saved"); e.textContent=t; e.style.color = warn?"var(--red)":"var(--ink3)"; }
+function save(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(state()));
+    stamp("已記住 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}));
+  }catch(err){ stamp("⚠ 圖片太多記不住，請先按「存檔」下載", true); }
+}
+try{ const raw = localStorage.getItem(KEY); if(raw) apply(JSON.parse(raw)); }catch(e){}
+if(!when.value) when.value = new Date().toLocaleDateString("zh-TW");
+count();
+
+/* ============ 交件 ============ */
+let DL = null;
+function toast(t){ const e=document.getElementById("toast"); e.textContent=t; e.classList.add("on"); clearTimeout(toast._t); toast._t=setTimeout(()=>e.classList.remove("on"),2600); }
+const DLBTNS = ["b-save","b-png","b-doc"].map(id=>document.getElementById(id));
+DLBTNS.forEach(b=>b.disabled = true);
+if(window.claude && window.claude.use){
+  window.claude.use("downloads").then(d=>{
+    DL = d;
+    DLBTNS.forEach(b=>b.disabled = !d);
+    if(!d) stamp("這個畫面不能下載檔案，填完請通知設計師", true);
+  }).catch(()=>{ DLBTNS.forEach(b=>b.disabled=true); });
+} else {
+  DLBTNS.forEach(b=>b.disabled = false);   // 本機開啟的複本
+}
+async function offer(filename, data){
+  if(DL){
+    try{ await DL.save({filename, data}); toast("已下載："+filename); }
+    catch(err){
+      const c = err && err.code;
+      if(c==="declined") return;
+      if(c==="rate_limited") toast("剛剛已經有一個下載在問你了，稍等一下再按");
+      else if(c==="too_large") toast("檔案太大了，請先移掉幾張圖再試");
+      else toast("這個畫面沒辦法下載檔案");
+    }
+    return;
+  }
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data]));
+  a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast("已下載："+filename);
+}
+function stem(){
+  const w = (who.value||"未填").replace(/[\\/:*?"<>|\s]+/g,"");
+  const d = new Date().toISOString().slice(0,10).replace(/-/g,"");
+  return "網站文案_"+w+"_"+d;
+}
+
+function collect(){
+  return ALL.map(n=>{
+    const pg = document.getElementById("pg-"+n.k);
+    const secs = [...pg.querySelectorAll(".section")].map(s=>{
+      const items = [];
+      s.querySelectorAll("[data-k],[data-img],.ask").forEach(el=>{
+        if(el.classList.contains("ask")){
+          const on = el.querySelector(".chip.on");
+          const note = el.querySelector(".f[data-k]");
+          items.push({type:"ask", q:el.querySelector(".ask-q").textContent.replace(/^請你決定：/,""),
+                      a:on?on.textContent:"（還沒選）", note:note?note.innerText.trim():""});
+        } else if(el.hasAttribute("data-img")){
+          items.push({type:"img", ph:el.dataset.ph, name:(IMGS[el.dataset.img]||{}).name||""});
+        } else if(el.classList.contains("f") && !el.closest(".ask")){
+          const prev = el.previousElementSibling;
+          items.push({type:"text", ph:el.dataset.ph||"",
+                      cap: prev && prev.classList.contains("cap") ? prev.textContent : "",
+                      v: el.innerText.trim()});
+        }
+      });
+      return {label:s.dataset.sec, items};
+    });
+    return {page:n.en, secs};
+  });
+}
+function buildMd(){
+  const L = [];
+  L.push("# 網站文案","", "填寫人："+(who.value||"—")+"　／　日期："+(when.value||"—"), "");
+  let empty = 0, undecided = 0;
+  collect().forEach(p=>{
+    L.push("---","","## "+p.page,"");
+    p.secs.forEach(s=>{
+      L.push("### "+s.label,"");
+      s.items.forEach(it=>{
+        if(it.type==="text"){
+          const k = (it.cap||it.ph||"內容").replace(/\n/g," ");
+          if(it.v) L.push("**"+k+"**","", it.v, "");
+          else { empty++; L.push("**"+k+"**","", "> （未填）", ""); }
+        } else if(it.type==="img"){
+          L.push("**［圖］"+it.ph+"**","", it.name ? "檔名："+it.name : "> （未提供）", "");
+        } else {
+          if(it.a==="（還沒選）") undecided++;
+          L.push("**❓ "+it.q+"**","", "- 回答："+it.a, it.note?"- 補充："+it.note:"", "");
+        }
+      });
+    });
+  });
+  L.push("---","","未填欄位 "+empty+" 個　／　還沒決定的事 "+undecided+" 件","");
+  return L.filter(x=>x!==null).join("\n").replace(/\n{3,}/g,"\n\n");
+}
+
+
+function buildDoc(){
+  let h = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>網站文案</title>
+  <style>body{font-family:"Noto Sans TC","PingFang TC",sans-serif;font-size:11pt;line-height:1.8;}
+  h1{font-size:20pt;border-bottom:2px solid #000;padding-bottom:6pt;}
+  h2{font-size:15pt;margin-top:24pt;background:#eee;padding:6pt 8pt;}
+  h3{font-size:12pt;margin-top:16pt;color:#444;border-left:4px solid #999;padding-left:8pt;}
+  .cap{font-size:9pt;color:#888;margin:8pt 0 0;}
+  .val{margin:2pt 0 0;white-space:pre-wrap;}
+  .empty{color:#a83a2b;}
+  .ask{border:1px solid #a83a2b;padding:6pt 8pt;margin:8pt 0;}</style></head><body>`;
+  h += `<h1>網站文案</h1><p>填寫人：${esc(who.value||"—")}　／　日期：${esc(when.value||"—")}</p>`;
+  let empty=0, undecided=0;
+  collect().forEach(p=>{
+    h += `<h2>${esc(p.page)}</h2>`;
+    p.secs.forEach(s=>{
+      h += `<h3>${esc(s.label)}</h3>`;
+      s.items.forEach(it=>{
+        if(it.type==="text"){
+          if(!it.v) empty++;
+          h += `<p class="cap">${esc(it.cap||it.ph||"內容")}</p><p class="val${it.v?"":" empty"}">${it.v?esc(it.v).replace(/\n/g,"<br>"):"（未填）"}</p>`;
+        } else if(it.type==="img"){
+          h += `<p class="cap">［圖］${esc(it.ph)}</p><p class="val${it.name?"":" empty"}">${it.name?esc(it.name):"（未提供）"}</p>`;
+        } else {
+          if(it.a==="（還沒選）") undecided++;
+          h += `<div class="ask"><b>請你決定：${esc(it.q)}</b><br>回答：${esc(it.a)}${it.note?"<br>補充："+esc(it.note):""}</div>`;
+        }
+      });
+    });
+  });
+  h += `<hr><p>未填欄位 ${empty} 個　／　還沒決定的事 ${undecided} 件</p></body></html>`;
+  return h;
+}
+document.getElementById("b-print").onclick = ()=>window.print();
+
+document.getElementById("b-doc").onclick = ()=>offer(stem()+".doc", "\ufeff"+buildDoc());
+document.getElementById("b-save").onclick = ()=>offer(stem()+".json", JSON.stringify(state(),null,2));
+document.getElementById("b-load").onclick = ()=>document.getElementById("jsonpick").click();
+document.getElementById("jsonpick").addEventListener("change", e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{ apply(JSON.parse(r.result)); save(); toast("讀取完成"); }catch(err){ toast("這個檔案讀不了"); } };
+  r.readAsText(f); e.target.value="";
+});
+document.getElementById("b-png").onclick = ()=>{
+  const run = ()=>{
+    toast("產圖中…");
+    html2canvas(document.getElementById("pg-"+CUR),
+      {backgroundColor:getComputedStyle(document.body).backgroundColor, scale:2, useCORS:true})
+      .then(cv=>cv.toBlob(b=>offer(stem()+"_"+CUR+".png", b)))
+      .catch(()=>toast("產圖失敗，請改按「交件」下載文字檔"));
+  };
+  if(window.html2canvas) return run();
+  toast("圖片工具還在載入，等一下再按一次");
+};
+window.addEventListener("beforeunload", save);
+</script>
+
+</body>
+</html>
