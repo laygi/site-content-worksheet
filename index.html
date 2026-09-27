@@ -133,6 +133,9 @@ button{font-family:inherit;}
 .toast.on{opacity:1;}
 .cell.fillcell{display:flex;flex-direction:column;}
 .cell.fillcell .img-ph{flex:1;}
+.trinote{border-bottom:1px dashed var(--line2);padding:var(--s3) var(--s3);background:var(--red-bg);}
+.trinote-t{margin:0 0 4px;font-size:var(--f-sm);font-weight:700;color:var(--red);}
+.trinote-b{margin:0;font-size:var(--f-sm);}
 .setupbar{justify-content:flex-start;gap:14px;}
 .setupnote{font-size:var(--f-xs);color:var(--ink3);}
 .side a.setupitem{font-weight:700;border-top:none;}
@@ -177,11 +180,11 @@ button{font-family:inherit;}
   </div>
   <div class="tb-prog"><span id="progtxt">0 / 0</span><span class="meter"><i id="meter"></i></span><span id="saved" style="color:var(--ink3)"></span></div>
   <div class="tb-acts">
-    <button class="btn" id="b-load">讀取存檔</button>
-    <button class="btn" id="b-save">存檔</button>
-    <button class="btn" id="b-print">列印／PDF</button>
-    <button class="btn" id="b-png">這頁存成圖</button>
-    <button class="btn primary" id="b-doc">交件</button>
+    <button class="btn" id="b-load" title="讀回之前暫存的 .json，接著上次繼續填">讀取進度</button>
+    <button class="btn" id="b-save" title="下載 .json 進度檔。只有這個工具讀得懂，用來下次接著填">暫存進度</button>
+    <button class="btn" id="b-print" title="把全部頁面印出來或存成 PDF">列印／PDF</button>
+    <button class="btn" id="b-png" title="把目前這一頁存成 PNG 圖片">這頁存成圖</button>
+    <button class="btn primary" id="b-doc" title="下載整理好的文案檔，交給設計師">完成交件</button>
   </div>
 </header>
 
@@ -195,8 +198,8 @@ button{font-family:inherit;}
       <i>· 有底色的框直接打字就好，會自動記住</i>
       <i>· 灰底斜線的方塊點一下可以放圖</i>
       <i>· 紅框是要請你決定的事</i>
-      <i>· 填完按右上角 <b>交件</b>，把下載的 Word 檔傳給設計師</i>
-      <i>· 內容只記在這台電腦的瀏覽器裡。要換電腦填，先按<b>存檔</b>把檔案帶走</i>
+      <i>· 填完按右上角 <b>完成交件</b>，把下載的 Word 檔傳給設計師</i>
+      <i>· 內容只記在這台電腦的瀏覽器裡。要換電腦填，先按<b>暫存進度</b>把檔案帶走</i>
     </div>
   </aside>
   <main class="main"><div class="frame" id="frame">
@@ -212,14 +215,14 @@ button{font-family:inherit;}
 <script>
 /* ============ 導覽列（已改成新命名） ============ */
 const NAV = [
-  {k:"home",    en:"首頁",       zh:"首頁"},
-  {k:"about",   en:"About us",   zh:"關於我們"},
-  {k:"stay",    en:"Stay",       zh:"住宿"},
-  {k:"access",  en:"Access",     zh:"交通"},
-  {k:"wander",  en:"Wander",     zh:"周邊漫遊"},
-  {k:"qa",      en:"Q&A",        zh:"常見問題"},
-  {k:"contact", en:"Contact",    zh:"聯絡我們"},
-  {k:"journal", en:"Journal",    zh:"山裡的事情"}
+  {k:"home",    en:"首頁",       zh:"首頁",      ja:"ホーム"},
+  {k:"about",   en:"About us",   zh:"關於我們",  ja:"私たちについて"},
+  {k:"stay",    en:"Stay",       zh:"住宿",      ja:"お部屋"},
+  {k:"access",  en:"Access",     zh:"交通",      ja:"アクセス"},
+  {k:"wander",  en:"Wander",     zh:"周邊漫遊",  ja:"周辺を歩く"},
+  {k:"qa",      en:"Q&A",        zh:"常見問題",  ja:"よくある質問"},
+  {k:"contact", en:"Contact",    zh:"聯絡我們",  ja:"お問い合わせ"},
+  {k:"journal", en:"Journal",    zh:"山裡的事情",ja:"山のはなし"}
 ];
 
 /* ============ 小元件 ============ */
@@ -401,12 +404,20 @@ PAGES.setup = `
     <div class="logo">全站共用</div>
     <span class="setupnote">這一頁不是網站的某一頁，是整個網站到處都會用到的東西</span>
   </div>`
++ `<div class="trinote">
+    <p class="trinote-t">這個網站會做 中文 ／ 英文 ／ 日文 三種語言</p>
+    <p class="trinote-b">下面「導覽列命名」和「品牌標語」這兩處請三種都填。
+    <b>其他頁面請先用中文填就好</b>，英日文的翻譯我們另外處理 —— 不用您一次寫三遍。</p>
+  </div>`
 + SEC("品牌基本資料",
     `<div class="grid c2">
       <div class="cell">${CAP("品牌中文名")}${T("g_name_zh","","sm")}</div>
       <div class="cell">${CAP("品牌英文名")}${T("g_name_en","","sm")}</div>
+    </div>`
+  + `<div class="grid c3" style="margin-top:16px">
       <div class="cell">${CAP("一句話標語（中文）")}${T("g_tag_zh","放在 LOGO 旁邊或頁尾的那一句","sm")}</div>
-      <div class="cell">${CAP("一句話標語（英文，可留空）")}${T("g_tag_en","","sm")}</div>
+      <div class="cell">${CAP("一句話標語（英文）")}${T("g_tag_en","","sm")}</div>
+      <div class="cell">${CAP("一句話標語（日文）")}${T("g_tag_ja","","sm")}</div>
     </div>`
   + `<div class="grid c2" style="margin-top:16px">
       <div class="cell fillcell">${CAP("LOGO 檔案")}${IMG("g_logo",130,"LOGO（有向量檔 AI／SVG 最好，之後再給也可以）")}</div>
@@ -416,15 +427,21 @@ PAGES.setup = `
         ${CAP("希望網站給人的感覺（三個形容詞就好）")}${T("g_mood","例：安靜、乾淨、有溫度","sm")}
       </div>
     </div>`)
-+ SEC("導覽列命名（中英對照）",
-    `<p class="cap" style="margin-bottom:12px">英文已經定案了，請填中文要怎麼寫。這會出現在網站最上面那排。</p>
-     <div class="grid c2">${NAV.map(n=>`<div class="cell"><p class="cap">${n.en}</p>${T("nav_"+n.k,"中文怎麼寫？例：「"+n.zh+"」","sm")}</div>`).join("")}</div>`)
++ SEC("導覽列命名（中／英／日）",
+    `<p class="cap" style="margin-bottom:12px">英文已經定案了，請填中文和日文要怎麼寫。這會出現在網站最上面那一排。<br>
+      日文那欄的灰字是我們先擬的版本，覺得可以就照抄，不順請直接改掉。</p>
+     <div class="grid c2">${NAV.map(n=>`<div class="cell stack">
+        <p class="cap" style="margin:0;font-weight:700;color:var(--ink)">${n.en}</p>
+        ${T("nav_"+n.k,"中文：例「"+n.zh+"」","sm")}
+        ${T("navja_"+n.k,"日文：例「"+n.ja+"」","sm")}
+      </div>`).join("")}</div>`)
 + SEC("全站共用文字",
     `<div class="grid c2">
       <div class="cell">${CAP("訂房按鈕統一寫什麼")}${T("g_btn_book","例：立即訂房","sm")}</div>
       <div class="cell">${CAP("頁尾版權文字")}${T("g_copyright","例：© 2026 ○○○ All rights reserved.","sm")}</div>
     </div>`
-  + ASK("ask_bilingual","網站要做中英雙語嗎？",["中英雙語","只做中文","只做英文","還沒決定"]));
+  + ASK("ask_langs","網站確定要做哪幾種語言？",["中／英／日 三種","中／英 兩種","只做中文","還沒決定"])
+  + ASK("ask_translate","英文和日文的翻譯由誰負責？",["我們自己找人翻","請設計師這邊處理","還沒決定"]));
 
 const ALL = [{k:"setup", en:"網站通用設定"}].concat(NAV);
 
@@ -552,13 +569,13 @@ const CAN_STORE = (function(){
   try{ localStorage.setItem("__probe","1"); localStorage.removeItem("__probe"); return true; }
   catch(e){ return false; }
 })();
-const NO_STORE_MSG = "⚠ 這個瀏覽器不會自動記住內容 — 請常按「存檔」";
+const NO_STORE_MSG = "⚠ 這個瀏覽器不會自動記住內容 — 請常按「暫存進度」";
 function save(){
   if(!CAN_STORE){ stamp(NO_STORE_MSG, true); return; }
   try{
     localStorage.setItem(KEY, JSON.stringify(state()));
     stamp("已記住 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}));
-  }catch(err){ stamp("⚠ 圖片太多存不下 — 請按「存檔」把進度下載下來", true); }
+  }catch(err){ stamp("⚠ 圖片太多存不下 — 請按「暫存進度」把檔案下載下來", true); }
 }
 if(CAN_STORE){ try{ const raw = localStorage.getItem(KEY); if(raw) apply(JSON.parse(raw)); }catch(e){} }
 else { stamp(NO_STORE_MSG, true); }
