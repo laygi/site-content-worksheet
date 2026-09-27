@@ -234,6 +234,13 @@ const ASK = (k,q,opts) => `<div class="ask"><p class="ask-q">請你決定：${q}
   <div class="chips">${opts.map(o=>`<span class="chip" data-chip="${k}" data-v="${esc(o)}">${o}</span>`).join("")}</div>
   ${T(k+"__note","補充說明（可留空）","sm note-f")}</div>`;
 const SEC = (label,inner) => `<div class="section" data-sec="${esc(label)}"><p class="label">${label}</p>${inner}</div>`;
+// 每一頁開頭都是同一個結構：主圖 → 主張（大標）→ 引言（小標）
+const HERO = (k, imgPh, h1Eg, subEg) => SEC("Hero — 主圖 ＋ 主張（大標）＋ 引言",
+    IMG(k+"_hero",220,imgPh)
+  + `<div class="stack" style="margin-top:16px">
+      ${CAP("主張／大標（建議 10–16 字。要是一句主張，不是題目）")}${T(k+"_h1",h1Eg,"ttl")}
+      ${CAP("引言／小標（建議 40–70 字）")}${T(k+"_sub",subEg,"big")}
+    </div>`);
 
 function navBar(cur){
   return `<div class="nav">
@@ -246,12 +253,9 @@ function navBar(cur){
 const PAGES = {
 
 home: navBar("home")
-+ SEC("Hero — 主視覺＋一句歡迎",
-    IMG("home_hero",240,"主視覺照片或插圖（橫式，越大越好）")
-  + `<div class="stack" style="margin-top:16px">
-      ${CAP("大標（建議 10–16 字，是一句主張，不是題目）")}${T("home_h1","例：在山裡，光會自己找到路","ttl")}
-      ${CAP("副標／歡迎詞（建議 40–70 字）")}${T("home_h1sub","簡單說這裡是什麼、給誰來、來了會怎樣","big")}
-    </div>`)
++ HERO("home","整個網站的主視覺（橫式，越大越好）",
+       "例：在山裡，光會自己找到路",
+       "簡單說這裡是什麼、給誰來、來了會怎樣")
 + SEC("Intro — 三個房間與合作方式",
     `<div class="grid c2">
       <div class="cell">${IMG("home_intro_img",190,"包棟／屋子代表照")}</div>
@@ -278,17 +282,21 @@ home: navBar("home")
   + ASK("ask_book_link","網站要不要直接串訂房網址？",["要，直接跳轉","不要，只留聯絡方式","還沒決定"])),
 
 about: navBar("about")
-+ SEC("1. 品牌詳述",
++ HERO("about","主理人的照片，或最能代表你們的空間照",
+       "例：我們為什麼把房子蓋在這裡",
+       "一句話說你們是誰、在做什麼、為什麼是這裡")
++ SEC("品牌詳述",
     CAP("品牌故事（建議 200–400 字，可以分段）")+T("about_story","","big")
   + CAP("主理人一句話自介（建議 20–35 字）")+T("about_oneline",""))
-+ SEC("2. 插圖", IMG("about_img",220,"插圖或人物照"))
-+ SEC("3. 訂房連結",
++ SEC("插圖", IMG("about_img",220,"插圖或人物照"))
++ SEC("訂房連結",
     CAP("按鈕文字")+T("about_btn","例：前往訂房","sm")
   + ASK("ask_about_book","這頁需要訂房按鈕嗎？",["需要","不需要"])),
 
 stay: navBar("stay")
-+ SEC("區塊開頭",
-    CAP("小標")+T("stay_h","")+CAP("引言（建議 40–80 字）")+T("stay_intro","","big"))
++ HERO("stay","三個房間的代表照，或空間的氛圍照",
+       "例：三個房間，三種光",
+       "這三個房間整體想給人什麼感覺，怎麼選")
 + SEC("三個房型",
     `<div class="grid c3">`
     + [["soil","About soil","曆光"],["stone","About stone","循光"],["plant","About Plant","勻光"]].map(([id,en,zh])=>
@@ -304,6 +312,9 @@ stay: navBar("stay")
   + ASK("ask_stay_book","每個房型頁要不要各自串訂房連結？",["要，各自一條","不要，統一一條","還沒決定"])),
 
 access: navBar("access")
++ HERO("access","沿路的風景，或入口／招牌的照片",
+       "例：路有點遠，但不難找",
+       "先回答客人心裡的「會不會很難到」，再講細節")
 + SEC("交通方式",
     `<div class="grid c2">
       <div class="cell stack">
@@ -332,9 +343,11 @@ access: navBar("access")
     </div>`),
 
 wander: navBar("wander")
++ HERO("wander","周邊環境的照片（山、路、店、人都可以）",
+       "例：走出門，才是這裡的重點",
+       "周邊大概有什麼、走一圈大概要多久")
 + SEC("怎麼玩、怎麼走",
-    CAP("引言（建議 40–80 字）")+T("wan_intro","","big")
-  + `<div class="grid c3" style="margin-top:16px">`
+    `<div class="grid c3">`
     + [["see","a. 看","風景、景點、拍照的地方"],["eat","b. 吃","餐廳、市集、在地食物"],["hear","c. 聽","導覽、聲音、故事"]].map(([id,t,ph])=>
       `<div class="cell stack">
         <p class="sub">${t}</p>
@@ -348,6 +361,9 @@ wander: navBar("wander")
   + CAP("說明（時間、人數、費用、怎麼預約）")+T("wan_tour_b","","big")),
 
 qa: navBar("qa")
++ HERO("qa","空間的細節照（床、浴室、窗景之類）",
+       "例：來之前，你可能想先知道這些",
+       "一句話說明這一頁在回答什麼")
 + SEC("常見問題",
     [1,2,3,4,5,6].map(i=>
       `<div class="grid c2" style="margin-bottom:${i<6?'12px':'0'}">
@@ -359,6 +375,9 @@ qa: navBar("qa")
     ASK("ask_qa_book","這頁底部要不要放聯絡方式／訂房連結？",["要","不要"])),
 
 contact: navBar("contact")
++ HERO("contact","門口、招牌，或你們接待客人的畫面",
+       "例：想聊聊，隨時找我們",
+       "哪個管道最快、大概多久會回覆")
 + SEC("聯絡我們",
     `<div class="grid c3">
       ${[["ig","Instagram","@帳號"],["book","訂房","訂房平台名稱或網址"],["line","Line","Line ID 或 @官方帳號"]]
@@ -376,10 +395,11 @@ contact: navBar("contact")
   + CAP("想對訪客說的一句話（可留空）")+T("ct_word","","sm")),
 
 journal: navBar("journal")
-+ SEC("山裡的事情 Journal",
-    CAP("專欄標題")+T("jn_h","")
-  + CAP("專欄簡介（建議 60–100 字）")+T("jn_intro","","big")
-  + CAP("書寫者簡短介紹")+T("jn_author","","sm"))
++ HERO("journal","最能代表這個專欄的一張照片",
+       "例：山裡的事情，慢慢說",
+       "這個專欄在寫什麼、多久更新一次")
++ SEC("書寫者",
+    CAP("書寫者簡短介紹（建議 30–50 字）")+T("jn_author","","sm"))
 + SEC("分類名稱",
     `<div class="grid c3">
       ${["jn_c1","jn_c2","jn_c3","jn_c4","jn_c5","jn_c6"].map((k,i)=>
