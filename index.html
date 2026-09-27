@@ -184,7 +184,7 @@ button{font-family:inherit;}
     <button class="btn" id="b-save" title="下載 .json 進度檔。只有這個工具讀得懂，用來下次接著填">暫存進度</button>
     <button class="btn" id="b-print" title="把全部頁面印出來或存成 PDF">列印／PDF</button>
     <button class="btn" id="b-png" title="把目前這一頁存成 PNG 圖片">這頁存成圖</button>
-    <button class="btn primary" id="b-doc" title="下載整理好的文案檔，交給設計師">完成交件</button>
+    <button class="btn primary" id="b-doc" title="下載兩個檔：文案檔（人看的）和進度檔（設計師匯入用），請一起寄出">完成交件</button>
   </div>
 </header>
 
@@ -198,7 +198,7 @@ button{font-family:inherit;}
       <i>· 有底色的框直接打字就好，會自動記住</i>
       <i>· 灰底斜線的方塊點一下可以放圖</i>
       <i>· 紅框是要請你決定的事</i>
-      <i>· 填完按右上角 <b>完成交件</b>，把下載的 Word 檔傳給設計師</i>
+      <i>· 填完按右上角 <b>完成交件</b>，會下載<b>兩個檔</b>，請一起傳給設計師</i>
       <i>· 內容只記在這台電腦的瀏覽器裡。要換電腦填，先按<b>暫存進度</b>把檔案帶走</i>
     </div>
   </aside>
@@ -229,7 +229,7 @@ const NAV = [
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const T   = (k,ph,cls="") => `<div class="f ${cls}" contenteditable="true" spellcheck="false" data-k="${k}" data-ph="${esc(ph)}"></div>`;
 const CAP = t => `<p class="cap">${t}</p>`;
-const IMG = (k,h,ph) => `<div class="img-ph" data-img="${k}" data-ph="${esc(ph)}" style="height:${h}px"><span class="img-hint">${ph}<br><em>點一下上傳圖片（可留空，之後再給檔案）</em></span><span class="x" data-del="${k}">移除</span></div>`;
+const IMG = (k,h,ph) => `<div class="img-ph" data-img="${k}" data-ph="${esc(ph)}" style="height:${h}px"><span class="img-hint">${ph}<br><em>點一下放圖（示意就好，原始檔請另外寄）</em></span><span class="x" data-del="${k}">移除</span></div>`;
 const ASK = (k,q,opts) => `<div class="ask"><p class="ask-q">請你決定：${q}</p>
   <div class="chips">${opts.map(o=>`<span class="chip" data-chip="${k}" data-v="${esc(o)}">${o}</span>`).join("")}</div>
   ${T(k+"__note","補充說明（可留空）","sm note-f")}</div>`;
@@ -511,11 +511,34 @@ const IMGS = {};
 const filepick = document.getElementById("filepick");
 let imgTarget = null;
 function pickImg(k){ imgTarget = k; filepick.value=""; filepick.click(); }
+const MAX_EDGE = 1200;   // 表格裡的圖只是「這裡放什麼」的示意，不需要原始解析度
+function shrink(file){
+  return new Promise(res=>{
+    const r = new FileReader();
+    r.onerror = ()=>res(null);
+    r.onload = ()=>{
+      const im = new Image();
+      const raw = {name:file.name, data:r.result, w:0, h:0, kb:Math.round(file.size/1024)};
+      im.onerror = ()=>res(raw);
+      im.onload = ()=>{
+        const s = Math.min(1, MAX_EDGE/Math.max(im.width, im.height));
+        const w = Math.max(1, Math.round(im.width*s)), h = Math.max(1, Math.round(im.height*s));
+        try{
+          const c = document.createElement("canvas"); c.width=w; c.height=h;
+          c.getContext("2d").drawImage(im,0,0,w,h);
+          res({name:file.name, data:c.toDataURL("image/jpeg",0.8),
+               w:im.width, h:im.height, kb:raw.kb});
+        }catch(e){ res(Object.assign(raw,{w:im.width,h:im.height})); }
+      };
+      im.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
 filepick.addEventListener("change", ()=>{
   const f = filepick.files[0]; if(!f || !imgTarget) return;
-  const r = new FileReader();
-  r.onload = () => { setImg(imgTarget, {name:f.name, data:r.result}); save(); };
-  r.readAsDataURL(f);
+  const k = imgTarget;
+  shrink(f).then(v=>{ if(v){ setImg(k, v); save(); } else toast("這張圖讀不進來，換一張試試"); });
 });
 function setImg(k, v){
   const box = document.querySelector(`[data-img="${k}"]`);
@@ -591,10 +614,18 @@ const CAN_STORE = (function(){
 const NO_STORE_MSG = "⚠ 這個瀏覽器不會自動記住內容 — 請常按「暫存進度」";
 function save(){
   if(!CAN_STORE){ stamp(NO_STORE_MSG, true); return; }
+  const now = ()=>new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"});
+  const st = state();
   try{
-    localStorage.setItem(KEY, JSON.stringify(state()));
-    stamp("已記住 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}));
-  }catch(err){ stamp("⚠ 圖片太多存不下 — 請按「暫存進度」把檔案下載下來", true); }
+    localStorage.setItem(KEY, JSON.stringify(st));
+    stamp("已記住 "+now());
+  }catch(err){
+    // 圖片太多塞不下 → 退一步，至少把打的字記住，別讓人白填
+    try{
+      localStorage.setItem(KEY, JSON.stringify(Object.assign({}, st, {imgs:{}})));
+      stamp("⚠ 圖片存不下，只記住文字（"+now()+"）— 請按「暫存進度」把圖片一起保存", true);
+    }catch(e2){ stamp(NO_STORE_MSG, true); }
+  }
 }
 if(CAN_STORE){ try{ const raw = localStorage.getItem(KEY); if(raw) apply(JSON.parse(raw)); }catch(e){} }
 else { stamp(NO_STORE_MSG, true); }
@@ -651,7 +682,8 @@ function collect(){
           items.push({type:"ask", q:el.querySelector(".ask-q").textContent.replace(/^請你決定：/,""),
                       a:on?on.textContent:"（還沒選）", note:note?note.innerText.trim():""});
         } else if(el.hasAttribute("data-img")){
-          items.push({type:"img", ph:el.dataset.ph, name:(IMGS[el.dataset.img]||{}).name||""});
+          const g = IMGS[el.dataset.img] || {};
+          items.push({type:"img", ph:el.dataset.ph, name:g.name||"", w:g.w, h:g.h, kb:g.kb});
         } else if(el.classList.contains("f") && !el.closest(".ask")){
           const prev = el.previousElementSibling;
           items.push({type:"text", ph:el.dataset.ph||"",
@@ -678,7 +710,8 @@ function buildMd(){
           if(it.v) L.push("**"+k+"**","", it.v, "");
           else { empty++; L.push("**"+k+"**","", "> （未填）", ""); }
         } else if(it.type==="img"){
-          L.push("**［圖］"+it.ph+"**","", it.name ? "檔名："+it.name : "> （未提供）", "");
+          const meta = it.w ? "（原圖 "+it.w+"×"+it.h+"，約 "+it.kb+" KB，請另外提供原始檔）" : "";
+          L.push("**［圖］"+it.ph+"**","", it.name ? "檔名："+it.name+meta : "> （未提供）", "");
         } else {
           if(it.a==="（還沒選）") undecided++;
           L.push("**❓ "+it.q+"**","", "- 回答："+it.a, it.note?"- 補充："+it.note:"", "");
@@ -712,7 +745,8 @@ function buildDoc(){
           if(!it.v) empty++;
           h += `<p class="cap">${esc(it.cap||it.ph||"內容")}</p><p class="val${it.v?"":" empty"}">${it.v?esc(it.v).replace(/\n/g,"<br>"):"（未填）"}</p>`;
         } else if(it.type==="img"){
-          h += `<p class="cap">［圖］${esc(it.ph)}</p><p class="val${it.name?"":" empty"}">${it.name?esc(it.name):"（未提供）"}</p>`;
+          const meta = it.w ? `（原圖 ${it.w}×${it.h}，約 ${it.kb} KB，請另外提供原始檔）` : "";
+          h += `<p class="cap">［圖］${esc(it.ph)}</p><p class="val${it.name?"":" empty"}">${it.name?esc(it.name)+meta:"（未提供）"}</p>`;
         } else {
           if(it.a==="（還沒選）") undecided++;
           h += `<div class="ask"><b>請你決定：${esc(it.q)}</b><br>回答：${esc(it.a)}${it.note?"<br>補充："+esc(it.note):""}</div>`;
@@ -725,7 +759,11 @@ function buildDoc(){
 }
 document.getElementById("b-print").onclick = ()=>window.print();
 
-document.getElementById("b-doc").onclick = ()=>offer(stem()+".doc", "\ufeff"+buildDoc());
+document.getElementById("b-doc").onclick = async ()=>{
+  await offer(stem()+".doc",  "\ufeff"+buildDoc());
+  await offer(stem()+".json", JSON.stringify(state(),null,2));
+  toast("兩個檔都下載好了 — 請「一起」寄給設計師");
+};
 document.getElementById("b-save").onclick = ()=>offer(stem()+".json", JSON.stringify(state(),null,2));
 document.getElementById("b-load").onclick = ()=>document.getElementById("jsonpick").click();
 document.getElementById("jsonpick").addEventListener("change", e=>{
