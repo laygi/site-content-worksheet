@@ -451,9 +451,8 @@ PAGES.setup = `
     `<p class="cap" style="margin-bottom:12px">英文已經定案了，請填中文和日文要怎麼寫。這會出現在網站最上面那一排。<br>
       日文那欄的灰字是我們先擬的版本，覺得可以就照抄，不順請直接改掉。</p>
      <div class="grid c2">${NAV.map(n=>`<div class="cell stack">
-        <p class="cap" style="margin:0;font-weight:700;color:var(--ink)">${n.en}</p>
-        ${T("nav_"+n.k,"中文：例「"+n.zh+"」","sm")}
-        ${T("navja_"+n.k,"日文：例「"+n.ja+"」","sm")}
+        ${CAP(n.en+"　中文")}${T("nav_"+n.k,"例「"+n.zh+"」","sm")}
+        ${CAP(n.en+"　日文")}${T("navja_"+n.k,"例「"+n.ja+"」","sm")}
       </div>`).join("")}</div>`)
 + SEC("全站共用文字",
     `<div class="grid c2">
